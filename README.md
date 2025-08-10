@@ -65,7 +65,7 @@ To run this machine, without any customization, you can use the
 following:
 
 ```sh
-sudo microvm -f https://github.com/sourcery-zone/agent-vm -c agent-vm
+sudo microvm -f git+https://github.com/sourcery-zone/agent-vm -c agent-vm
 ```
 
 ### Building the VM
