@@ -3,7 +3,8 @@
 This project provides a secure and compartmentalized environment for
 running AI agents. It utilizes
 [microvm.nix](https://github.com/microvm-nix/microvm.nix) to create a
-lightweight NixOS-based virtual machine.
+lightweight NixOS-based virtual machine. We would like to give a huge
+thanks to the `microvm.nix` project for their great work.
 
 The primary goal is to enable developers to safely run AI agents without
 compromising the security of their host system. The agent operates within a
@@ -33,6 +34,7 @@ controlled manner.
   - [Mounting Host Directories](#mounting-host-directories)
   - [Gemini Authentication](#gemini-authentication)
 - [Technical Details](#technical-details)
+- [Documentation](#documentation)
 - [Troubleshooting](#troubleshooting)
 - [Future Work](#future-work)
 - [Contributing](#contributing)
@@ -129,6 +131,12 @@ echo "export GEMINI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXX" >> /var/lib/microvms/a
 - **Base Image:** NixOS Unstable
 - **Networking:** User-mode networking with port forwarding (host port 2222 to
   guest port 22 for SSH).
+
+## Documentation
+
+For more detailed information about `microvm.nix` and its capabilities,
+please refer to the [official
+documentation](https://github.com/microvm-nix/microvm.nix).
 
 ## Troubleshooting
 
