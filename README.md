@@ -1,4 +1,4 @@
-# AI Agent Sandbox
+# Agent VM
 
 This project provides a secure and compartmentalized environment for
 running AI agents. It utilizes

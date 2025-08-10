@@ -1,0 +1,16 @@
+/result
+/result-*
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+*.log
+*.pid
+*.img
+GEMINI.md
+CLAUDE.md
