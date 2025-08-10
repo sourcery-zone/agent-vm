@@ -25,51 +25,6 @@
       packages.${system} = {
         default = self.packages.${system}.agent-vm;
         agent-vm = self.nixosConfigurations.agent-vm.config.microvm.declaredRunner;
-
-        run-vm = pkgs.writeShellApplication {
-          name = "run-vm";
-          runtimeInputs = with pkgs; [
-            tmux
-            virtiofsd
-          ];
-
-          text = ''
-            #!/usr/bin/env bash
-            set -euo pipefail
-
-            SESSION_NAME="agent"
-
-            # Start tmux session with the virtiofsd command
-            tmux new-session -d -s "$SESSION_NAME" -n virtiofsd bash -c "
-            virtiofsd \
-               --socket-path=agent-vm-virtiofs-project.sock \
-               --socket-group=kvm \
-               --shared-dir=$(pwd) \
-               --thread-pool-size $(nproc) \
-               --posix-acl --xattr
-           "
-
-           # Wait a few seconds before starting the second command
-           sleep 3
-
-           # Add second window to run nix command
-           tmux new-window -t "$SESSION_NAME" -n microvm bash -c "
-             nix run .#agent-vm
-           "
-
-           # Attach to the session
-           tmux attach-session -t "$SESSION_NAME"
-          '';
-        };
-      };
-
-      devShells.${system}.default = pkgs.mkShell {
-        name = "agent";
-
-        packages = [
-          pkgs.tmux
-          self.packages.${system}.run-vm
-        ];
       };
 
       nixosConfigurations = {
@@ -87,6 +42,10 @@
               users.users.agent = {
                 isNormalUser = true;
                 uid = 1000;
+                openssh.authorizedKeys.keys = [
+                  # Optional: replace with your public SSH key
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMxr0CoUGmzn4nPIhddJbZzOYy1WpCkewbiSTa8BKp4c shahin-fw"
+                ];
               };
 
               security.sudo.extraRules = [
@@ -104,12 +63,15 @@
               microvm = {
                 hypervisor = "qemu";
                 socket = "control.socket";
-
-                volumes = [{
-                  mountPoint = "/var";
-                  image = "var.img";
-                  size = 256;
-                }];
+                mem = 4096;
+                vcpu = 3;
+                volumes = [
+                  {
+                    mountPoint = "/var";
+                    image = "var.img";
+                    size = 256;
+                  }
+                ];
 
                 shares = [
                   {
@@ -120,9 +82,9 @@
                   }
                   {
                     proto = "virtiofs";
-                    tag = "project";
-                    source = ".";
-                    mountPoint = "/home/agent/project";
+                    tag = "agent-home";
+                    source = "/var/lib/microvms/agent-home";
+                    mountPoint = "/home/agent";
                   }
                 ];
 
@@ -133,10 +95,32 @@
                     mac = "52:54:00:12:34:56";
                   }
                 ];
+
+                forwardPorts = [
+                  {
+                    from = "host";
+                    proto = "tcp";
+                    host = {
+                      # address = "127.0.0.1";
+                      port = 2222;
+                    };
+                    guest = {
+                      # address = "127.0.0.1";
+                      port = 22;
+                    };
+                  }
+                ];
+
+              };
+
+              services.openssh = {
+                enable = true;
+                settings.PasswordAuthentication = false;
+                settings.PermitRootLogin = "no";
               };
 
               networking.firewall.enable = true;
-              networking.firewall.allowedTCPPorts = [ 443 ];
+              networking.firewall.allowedTCPPorts = [ 22 443 ];
 
               environment.systemPackages = with pkgs; [
                 git
