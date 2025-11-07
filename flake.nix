@@ -32,7 +32,7 @@
           inherit system;
           modules = [
             microvm.nixosModules.microvm
-            {
+            ({ config, ... }: {
               networking.hostName = "agent-vm";
               networking.useDHCP = true;
 
@@ -65,11 +65,18 @@
                 socket = "control.socket";
                 mem = 4096;
                 vcpu = 3;
+                
+                writableStoreOverlay = "/nix/.rw-store";
                 volumes = [
                   {
                     mountPoint = "/var";
                     image = "var.img";
                     size = 256;
+                  }
+                  {
+                    image = "nix-store-overlay.img";
+                    mountPoint = config.microvm.writableStoreOverlay;
+                    size = 10240;
                   }
                 ];
 
@@ -110,9 +117,12 @@
                     };
                   }
                 ];
-
               };
-
+              nix.settings = {
+                allowed-users = [ "agent" ];
+                trusted-users = [ "root" "agent" "@wheel" ];
+              };
+              
               services.openssh = {
                 enable = true;
                 settings.PasswordAuthentication = false;
@@ -126,11 +136,16 @@
                 git
                 claude-code
                 gemini-cli
+                devenv
+                direnv
+                nix-direnv
+                emacs
+                vim
               ];
 
               services.getty.autologinUser = "agent";
               system.stateVersion = "25.11";
-            }
+            })
           ];
         };
       };
