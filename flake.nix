@@ -63,7 +63,7 @@
               microvm = {
                 hypervisor = "qemu";
                 socket = "control.socket";
-                mem = 4096;
+                mem = 16384;
                 vcpu = 3;
                 
                 writableStoreOverlay = "/nix/.rw-store";
@@ -76,7 +76,7 @@
                   {
                     image = "nix-store-overlay.img";
                     mountPoint = config.microvm.writableStoreOverlay;
-                    size = 10240;
+                    size = 30720;
                   }
                 ];
 
@@ -141,6 +141,7 @@
                 nix-direnv
                 emacs
                 vim
+                opencode
               ];
 
               services.getty.autologinUser = "agent";
