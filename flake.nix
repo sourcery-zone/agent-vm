@@ -142,6 +142,7 @@
                 emacs
                 vim
                 opencode
+                nodejs_24 # useful to install agent skills
               ];
 
               services.getty.autologinUser = "agent";
