@@ -64,7 +64,7 @@
                 hypervisor = "qemu";
                 socket = "control.socket";
                 mem = 16384;
-                vcpu = 3;
+                vcpu = 8;
                 
                 writableStoreOverlay = "/nix/.rw-store";
                 volumes = [
@@ -142,6 +142,7 @@
                 emacs
                 vim
                 opencode
+                tmux
                 nodejs_24 # useful to install agent skills
               ];
 
